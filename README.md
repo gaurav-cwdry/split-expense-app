@@ -103,6 +103,7 @@ User authentication system
 Mobile-friendly or app version
 
 👤 Author
+
 Gaurab Chowdhury
 
 B.Tech in Computer Science & Engineering
