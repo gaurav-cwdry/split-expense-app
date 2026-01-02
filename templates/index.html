@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Split Expense Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_index.css') }}">
+</head>
+<body>
+
+<h1>Split Expense Manager</h1>
+
+<div class="trip-card">
+    <h2>➕ Create New Trip</h2>
+    <form method="POST" action="/add_trip" onsubmit="showToast('Trip created')">
+        <input type="text" name="trip_name" placeholder="Trip name" required>
+        <button>Add Trip</button>
+    </form>
+</div>
+
+{% for trip in trips %}
+<div class="trip-card">
+   <h2>
+    {{ trip["name"] }}
+    {% if trip.get("settled") %}
+        <span class="settled-badge">✔ Settled</span>
+    {% endif %}
+</h2>
+
+    <p>Members: {{ trip["members"]|length }}</p>
+    <a href="/trip/{{ loop.index0 }}">
+        <button>Open Trip</button>
+    </a>
+</div>
+{% else %}
+<div class="trip-card">No trips yet.</div>
+{% endfor %}
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settlement</title>
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_index.css') }}">
+
+    <!-- EmailJS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+    <script>
+        /* ===== EmailJS Init ===== */
+        (function(){
+            emailjs.init("Wctntrx0uDA_zKQez");   /* 🔴 CHANGE THIS */
+        })();
+
+        /* ===== Select All Members ===== */
+        function toggleSelectAll(source) {
+            const boxes = document.getElementsByName("member");
+            boxes.forEach(b => b.checked = source.checked);
+        }
+
+        /* ===== Send Mail Function ===== */
+        function sendMail() {
+            const boxes = document.getElementsByName("member");
+            let emails = [];
+
+            boxes.forEach(b => {
+                if (b.checked) {
+                    emails.push(b.value);
+                }
+            });
+
+            if (emails.length === 0) {
+                alert("Please select at least one member");
+                return;
+            }
+
+            /* ✅ SAFE: Read message from HTML (no Jinja in JS) */
+            let message = document.getElementById("settlement-message").innerHTML;
+
+            emails.forEach(email => {
+                emailjs.send(
+                    "service_76neojb",      /* 🔴 CHANGE THIS */
+                    "template_yh0k3ip",     /* 🔴 CHANGE THIS */
+                    {
+                        to_email: email,
+                        trip_name: "{{ trip['name'] }}",
+                        message: message
+                    }
+                ).then(
+                    function () {
+                        alert("Mail sent to " + email);
+                    },
+                    function (error) {
+                        alert("Email failed: " + JSON.stringify(error));
+                    }
+                );
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+<h1>Settlement Summary</h1>
+
+<div class="trip-card">
+    <h2>{{ trip["name"] }}</h2>
+
+    <!-- Settlement List -->
+    <ul>
+        {% for s in settlements %}
+            <li>{{ s["from"] }} owes {{ s["to"] }} ₹{{ s["amount"] }}</li>
+        {% else %}
+            <li>All settled 🎉</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Hidden message for EmailJS -->
+    <div id="settlement-message" style="display:none;">
+        {% for s in settlements %}
+            {{ s["from"] }} owes {{ s["to"] }} INR {{ s["amount"] }}<br>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <!-- Email Section -->
+    <h3>Send Settlement via Gmail</h3>
+
+    <label>
+        <input type="checkbox" onclick="toggleSelectAll(this)">
+        <strong>Select All Members</strong>
+    </label>
+
+    <ul>
+        {% for m in trip["members"] %}
+        <li>
+            <input type="checkbox" name="member" value="{{ m['email'] }}">
+            {{ m["name"] }} ({{ m["email"] }})
+        </li>
+        {% endfor %}
+    </ul>
+
+    <button onclick="sendMail()">📧 Send Settlement Mail</button>
+</div>
+
+<a href="/"><button>⬅ Back to Home</button></a>
+
+</body>
+</html>

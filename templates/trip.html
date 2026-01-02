@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ trip["name"] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_index.css') }}">
+</head>
+<body>
+
+<h1>{{ trip["name"] }}</h1>
+
+<div class="trip-card">
+    <h3>Add Member</h3>
+    <form method="POST" action="/add_member" onsubmit="showToast('Member added')">
+        <input type="hidden" name="trip_index" value="{{ index }}">
+        <input type="text" name="member_name" placeholder="Name" required>
+        <input type="email" name="member_email" placeholder="Email" required>
+        <button>Add Member</button>
+    </form>
+
+    <ul>
+        {% for m in trip["members"] %}
+        <li>{{ m["name"] }} ({{ m["email"] }})</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="trip-card">
+    <h3>Add Expense</h3>
+    <form method="POST" action="/add_expense" onsubmit="showToast('Expense added')">
+        <input type="hidden" name="trip_index" value="{{ index }}">
+        <input type="number" name="amount" placeholder="Amount" required>
+
+        <select name="paid_by">
+            {% for m in trip["members"] %}
+            <option value="{{ m['name'] }}">{{ m['name'] }}</option>
+            {% endfor %}
+        </select>
+
+        <button>Add Expense</button>
+    </form>
+</div>
+
+<div class="trip-card">
+    <h3>Balances</h3>
+    <ul>
+        {% for name, bal in trip["balances"].items() %}
+        <li class="{{ 'balance-positive' if bal >= 0 else 'balance-negative' }}">
+            {{ name }} : ₹{{ bal }}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <a href="/settlement/{{ index }}">
+        <button>Generate Settlement</button>
+    </a>
+</div>
+
+<a href="/"><button>⬅ Back</button></a>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
